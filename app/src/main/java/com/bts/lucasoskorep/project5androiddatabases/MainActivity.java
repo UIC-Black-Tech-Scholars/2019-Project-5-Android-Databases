@@ -5,11 +5,13 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.bts.lucasoskorep.project5androiddatabases.Database.AppDatabase;
+import com.bts.lucasoskorep.project5androiddatabases.Entities.User;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,14 +35,31 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         //database code here
-//        appDatabase = AppDatabase.getAppDatabase(this);
-////        populateWithTestData(appDatabase);
-////        for(User user: appDatabase.userDao().getAll()){
-////            Log.i(TAG, user.getFirstName() + " " + user.getLastName() + " : " + user.getAge() + " : " +user.getUid());
-////            user.setAge(102);
-////
-////        }
+        appDatabase = AppDatabase.getAppDatabase(this);
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                populateWithTestData(appDatabase);
+                for(User user: appDatabase.userDao().getAll()){
+                    Log.i(TAG, user.getFirstName() + " " + user.getLastName() + " : " + user.getAge() + " : " +user.getUid());
+                    user.setAge(102);
+                    updateUser(appDatabase, user);
+                }
 
+                Log.i(TAG, "Done updating the users, printing out the update results.");
+                for(User user: appDatabase.userDao().getAll()){
+                    Log.i(TAG, user.getFirstName() + " " + user.getLastName() + " : " + user.getAge() + " : " +user.getUid());
+                    deleteUser(appDatabase, user);
+                }
+                Log.i(TAG, "Removing all users from the database. ");
+                Log.i(TAG, "Attempting to print all users from teh database, there should be no more log messages after this. ");
+                for(User user: appDatabase.userDao().getAll()){
+                    Log.i(TAG, user.getFirstName() + " " + user.getLastName() + " : " + user.getAge() + " : " +user.getUid());
+
+                }
+            }
+        };
+        runnable.run();
     }
 
     @Override
@@ -63,21 +82,35 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-//    private static User updateUser(AppDatabase db, User user){
-//        db.userDao().updateUsers(user);
-//        return user;
-//    }
-//
-//    private static User addUser(final AppDatabase db, User user) {
-//        db.userDao().insertAll(user);
-//        return user;
-//    }
-//
-//    private static void populateWithTestData(AppDatabase db) {
-//        User user = new User();
-//        user.setFirstName("Ajay");
-//        user.setLastName("Saini");
-//        user.setAge(25);
-//        addUser(db, user);
-//    }
+    private static User updateUser(AppDatabase db, User user){
+        db.userDao().updateUsers(user);
+        return user;
+    }
+
+    private static void deleteUser(AppDatabase db, User user){
+        db.userDao().delete(user);
+    }
+
+    private static User addUser(final AppDatabase db, User user) {
+        db.userDao().insertAll(user);
+        return user;
+    }
+
+    private static void populateWithTestData(AppDatabase db) {
+        User user = new User();
+        user.setFirstName("Lucas");
+        user.setLastName("Oskorep");
+        user.setAge(22);
+        addUser(db, user);
+        user = new User();
+        user.setFirstName("Carmen");
+        user.setLastName("Bertucci");
+        user.setAge(25);
+        addUser(db, user);
+        user = new User();
+        user.setFirstName("Student");
+        user.setLastName("McStudentFace");
+        user.setAge(21);
+        addUser(db, user);
+    }
 }
